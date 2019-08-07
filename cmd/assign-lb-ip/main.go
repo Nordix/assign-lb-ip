@@ -13,7 +13,7 @@ import (
 	"os"
 )
 
-var version string = "unknown"
+var version = "unknown"
 
 func main() {
 	svc := flag.String("svc", "", "Service to update")
