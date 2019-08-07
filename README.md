@@ -30,7 +30,7 @@ spec:
   loadBalancerIP: 1000::8
 ```
 
-The EXTERNAL-IP will still be in "<pending>" but you can now simply
+The EXTERNAL-IP will still be in `<pending>` but you can now simply
 run `assign-lb-ip` to set the EXTERNAL-IP. Example;
 
 ```
@@ -60,6 +60,6 @@ go get github.com/Nordix/assign-lb-ip
 CGO_ENABLED=0 GOOS=linux go install -a \
   -ldflags "-extldflags '-static' -X main.version=$(date +%F:%T)" \
   github.com/Nordix/assign-lb-ip/cmd/assign-lb-ip
-strip $GOPATH/bin/service-watcher
+strip $GOPATH/bin/assign-lb-ip
 ```
 
