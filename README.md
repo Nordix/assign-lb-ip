@@ -31,7 +31,7 @@ spec:
 ```
 
 The EXTERNAL-IP will still be in `<pending>` but you can now simply
-run `assign-lb-ip` to set the EXTERNAL-IP. Example;
+run `assign-lb-ip` to set it. Example;
 
 ```
 # kubectl get svc mconnect-ipv6-lb
@@ -49,7 +49,9 @@ the manifest and set it as the "real" load-balancer IP.
 You can also explicitly specify the load-balancer IP using the `-ip`
 option.
 
-
+The service must have `type: LoadBalancer` and an explicitly specified
+`-ip` must work with `net.ParseIP()`. Other than that no checks are
+made.
 
 ## Build
 
