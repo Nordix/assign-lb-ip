@@ -56,8 +56,8 @@ made.
 ## Build
 
 ```
-go get k8s.io/client-go
-go get k8s.io/apimachinery
+go get k8s.io/client-go/...
+go get k8s.io/apimachinery/...
 go get github.com/Nordix/assign-lb-ip
 CGO_ENABLED=0 GOOS=linux go install -a \
   -ldflags "-extldflags '-static' -X main.version=$(date +%F:%T)" \

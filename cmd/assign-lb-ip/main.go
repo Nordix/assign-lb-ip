@@ -58,7 +58,7 @@ func assignLbIP(namespace, service, ip string) {
 		log.Fatalln("Failed to create k8s client; ", err)
 	}
 
-	svci := clientset.Core().Services(namespace)
+	svci := clientset.CoreV1().Services(namespace)
 	svc, err := svci.Get(service, meta.GetOptions{})
 	if err != nil {
 		log.Fatalf("Failed to get service [%s:%s]; %v\n", namespace, service, err)
