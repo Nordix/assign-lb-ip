@@ -3,14 +3,16 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
+	"net"
+	"os"
+	"strings"
+
 	core "k8s.io/api/core/v1"
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
-	"log"
-	"net"
-	"os"
 )
 
 var version = "unknown"
@@ -30,11 +32,15 @@ func main() {
 	if *svc == "" {
 		log.Fatalln("No service specified. Use -help")
 	}
-	if *ip != "" && net.ParseIP(*ip) == nil {
-		log.Fatalln("Invalid loadBalancerIP; ", *ip)
-	}
 
-	assignLbIP(*namespace, *svc, *ip)
+	ips := strings.Split(*ip, ",")
+	for _, i := range ips {
+		if net.ParseIP(i) == nil {
+			log.Fatalln("Invalid loadBalancerIP; ", i)
+		}
+    }
+
+	assignLbIP(*namespace, *svc, ips)
 
 	os.Exit(0)
 }
@@ -52,7 +58,7 @@ func getClientset() (*kubernetes.Clientset, error) {
 	return kubernetes.NewForConfig(config)
 }
 
-func assignLbIP(namespace, service, ip string) {
+func assignLbIP(namespace, service string, ips []string) {
 	clientset, err := getClientset()
 	if err != nil {
 		log.Fatalln("Failed to create k8s client; ", err)
@@ -71,15 +77,18 @@ func assignLbIP(namespace, service, ip string) {
 
 	// Take the user specifier loadBalancerIP if it exists and if no
 	// ip is specified.
-	if ip == "" {
+	if len(ips) == 0 {
 		if svc.Spec.LoadBalancerIP == "" {
 			log.Fatalln("No LoadBalancerIP is specified")
 		}
-		ip = svc.Spec.LoadBalancerIP
+		ips = []string{svc.Spec.LoadBalancerIP}
 	}
 
 	svc.Status.LoadBalancer = core.LoadBalancerStatus{
-		Ingress: []core.LoadBalancerIngress{{IP: ip}},
+		Ingress: make([]core.LoadBalancerIngress, len(ips)),
+	}
+	for i, ip := range ips {
+		svc.Status.LoadBalancer.Ingress[i] = core.LoadBalancerIngress{IP: ip}
 	}
 
 	svc, err = svci.UpdateStatus(svc)
