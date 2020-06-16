@@ -33,12 +33,15 @@ func main() {
 		log.Fatalln("No service specified. Use -help")
 	}
 
-	ips := strings.Split(*ip, ",")
-	for _, i := range ips {
-		if net.ParseIP(i) == nil {
-			log.Fatalln("Invalid loadBalancerIP; ", i)
+	ips := []string{}
+	if *ip != "" {
+		ips = strings.Split(*ip, ",")
+		for _, i := range ips {
+			if net.ParseIP(i) == nil {
+				log.Fatalln("Invalid loadBalancerIP; ", i)
+			}
 		}
-    }
+	}
 
 	assignLbIP(*namespace, *svc, ips)
 
