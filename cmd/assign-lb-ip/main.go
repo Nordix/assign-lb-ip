@@ -84,7 +84,12 @@ func assignLbIP(namespace, service string, ips []string) {
 		if svc.Spec.LoadBalancerIP == "" {
 			log.Fatalln("No LoadBalancerIP is specified")
 		}
-		ips = []string{svc.Spec.LoadBalancerIP}
+		ips = strings.Split(svc.Spec.LoadBalancerIP, ",")
+		for _, i := range ips {
+			if net.ParseIP(i) == nil {
+				log.Fatalln("Invalid loadBalancerIP; ", i)
+			}
+		}
 	}
 
 	svc.Status.LoadBalancer = core.LoadBalancerStatus{

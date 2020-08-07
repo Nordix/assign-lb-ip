@@ -21,7 +21,7 @@ kind: Service
 metadata:
   name: mconnect-ipv6-lb
 spec:
-  serviceIPFamily: IPv6Service
+  ipFamily: IPv6
   selector:
     app: mconnect
   ports:
@@ -68,4 +68,55 @@ GO111MODULE=on CGO_ENABLED=0 GOOS=linux go build -o assign-lb-ip \
   -ldflags "-extldflags '-static' -X main.version=$(date +%F:%T)" \
   ./cmd/...
 ```
+
+## K8s Dual-stack phase 3
+
+Dual-stack phase 3
+([KEP](https://github.com/kubernetes/enhancements/blob/master/keps/sig-network/20180612-ipv4-ipv6-dual-stack.md))
+will come in K8s v1.20 (alpha). This includes an API change. The
+service above will look like;
+
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: mconnect-ipv6-lb
+spec:
+  ipFamilies:
+  - IPv6
+  selector:
+    app: mconnect
+  ports:
+  - port: 5001
+  type: LoadBalancer
+  loadBalancerIP: 1000::8
+```
+
+A minimal change as you can see. But dual-stack phase 3 also allows
+one dual-stack service to be defined, not two separate services for
+ipv4 and ipv6;
+
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: mconnect-lb
+spec:
+  ipFamilyPolicy: PreferDualStack
+  selector:
+    app: mconnect
+  ports:
+  - port: 5001
+  type: LoadBalancer
+  loadBalancerIP: "1000::8,10.0.0.1"
+```
+
+Here `PreferDualStack` means that the service will be dual-stack if
+deployed in a dual-stack cluster. The "loadBalancerIP" is a list of
+addresses. K8s does not document that a list of addresses may be used
+but K8s does not use this filed at all and does not make any syntax
+check, so this works.
+
+`Assign-lb-ip` >= v2.1.0 is able to interpret a list of addresses in
+`loadBalancerIP`.
 
