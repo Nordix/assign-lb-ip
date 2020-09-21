@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log"
@@ -68,7 +69,7 @@ func assignLbIP(namespace, service string, ips []string) {
 	}
 
 	svci := clientset.CoreV1().Services(namespace)
-	svc, err := svci.Get(service, meta.GetOptions{})
+	svc, err := svci.Get(context.TODO(), service, meta.GetOptions{})
 	if err != nil {
 		log.Fatalf("Failed to get service [%s:%s]; %v\n", namespace, service, err)
 	}
@@ -99,7 +100,7 @@ func assignLbIP(namespace, service string, ips []string) {
 		svc.Status.LoadBalancer.Ingress[i] = core.LoadBalancerIngress{IP: ip}
 	}
 
-	svc, err = svci.UpdateStatus(svc)
+	svc, err = svci.UpdateStatus(context.TODO(), svc, meta.UpdateOptions{})
 	if err != nil {
 		log.Fatalf("Failed to update service [%s:%s]; %v\n", namespace, service, err)
 	}
