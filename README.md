@@ -86,6 +86,8 @@ NAME                    TYPE           CLUSTER-IP    EXTERNAL-IP        PORT(S) 
 mserver-preferdual-lb   LoadBalancer   12.0.22.230   10.0.0.2,1000::2   5001:31686/TCP,5003:31406/TCP   2m16s
 ```
 
+Use the `-clear` option to remove LoadBalancerIPs.
+
 ### Older dual-stack versions
 
 Before K8s v1.20.0 only single-stack services could be specified but

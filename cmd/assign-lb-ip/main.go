@@ -23,6 +23,7 @@ func main() {
 	namespace := flag.String("n", "default", "Namespace")
 	ip := flag.String("ip", "", "loadBalancerIP")
 	ver := flag.Bool("version", false, "Print version and quit")
+	clear := flag.Bool("clear", false, "Clear all loadBalancerIPs")
 	flag.Parse()
 
 	if *ver {
@@ -44,7 +45,7 @@ func main() {
 		}
 	}
 
-	assignLbIP(*namespace, *svc, ips)
+	assignLbIP(*namespace, *svc, ips, *clear)
 
 	os.Exit(0)
 }
@@ -62,7 +63,7 @@ func getClientset() (*kubernetes.Clientset, error) {
 	return kubernetes.NewForConfig(config)
 }
 
-func assignLbIP(namespace, service string, ips []string) {
+func assignLbIP(namespace, service string, ips []string, clear bool) {
 	clientset, err := getClientset()
 	if err != nil {
 		log.Fatalln("Failed to create k8s client; ", err)
@@ -72,6 +73,15 @@ func assignLbIP(namespace, service string, ips []string) {
 	svc, err := svci.Get(context.TODO(), service, meta.GetOptions{})
 	if err != nil {
 		log.Fatalf("Failed to get service [%s:%s]; %v\n", namespace, service, err)
+	}
+
+	if clear {
+		svc.Status.LoadBalancer = core.LoadBalancerStatus{}
+		svc, err = svci.UpdateStatus(context.TODO(), svc, meta.UpdateOptions{})
+		if err != nil {
+			log.Fatalf("Failed to clear service [%s:%s]; %v\n", namespace, service, err)
+	}
+		return
 	}
 
 	// Check that the service has "type: LoadBalancer"
