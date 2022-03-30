@@ -4,7 +4,7 @@ go 1.13
 
 require (
 	github.com/imdario/mergo v0.3.8 // indirect
-	k8s.io/api v0.19.0
-	k8s.io/apimachinery v0.19.0
-	k8s.io/client-go v0.19.0
+	k8s.io/api v0.21.0
+	k8s.io/apimachinery v0.21.0
+	k8s.io/client-go v0.21.0
 )

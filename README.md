@@ -113,7 +113,7 @@ spec:
 
 ```
 GO111MODULE=on CGO_ENABLED=0 GOOS=linux go build -o assign-lb-ip \
-  -ldflags "-extldflags '-static' -X main.version=$(date +%F:%T)" \
+  -ldflags "-extldflags '-static' -X main.version=$(git describe --dirty --tags)" \
   ./cmd/...
 ```
 
